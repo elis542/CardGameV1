@@ -1,0 +1,21 @@
+<DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <title>Card Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body id="StartBody">
+    <h1>Finns i sjön</h1>
+    <div id="inputID">
+        <label for="name">Spel ID:</label>
+        <input type="number" id="gameIDInput" step="1" />
+    </div>
+  <div id="valknappar">
+  <button onclick="createGame()" id="knapp">skapa ett spel!</button>
+  <button onclick="joinGame()" id="knapp">anslut till ett spel!</button>
+  <p id="ErrorMessage"></p>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

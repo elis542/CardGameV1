@@ -1,0 +1,26 @@
+<DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Card Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body id="StartBody">
+    <h1 id="LobbyText">Lobby</h1>
+    <p id="displayID">Game ID:</p>
+    <p id="displayIDname">Your player ID:</p>
+    <div id="lobbyVisning">
+      <p style="margin-bottom: 1px;" id="spelarelobby">Spelare i lobby:</p>
+      <div>
+        <ul style="margin-top: 1px;" id="playerList"></ul>
+      </div>
+      
+    </div>
+      <button onclick="leaveGame()" id="knappLeave">
+        Leave Game
+      </button>
+      <button onclick="startGame()" id="knappStart">
+        Starta
+      </button>
+<script src="lobbyScript.js"></script>
+</body>
