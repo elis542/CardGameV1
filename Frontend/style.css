@@ -80,21 +80,55 @@
     color:rgb(250, 234, 11)
 }
 
+#cardArea1 {
+    width: 100%;
+    height: 100%;
+}
+
 .parent {
 display: grid;
 grid-template-columns: repeat(3, 1fr);
 grid-template-rows: repeat(3, 1fr);
 grid-column-gap: 0px;
 grid-row-gap: 0px;
+width: 100%;
+height: 95%;
 }
 
-.div1 { grid-area: 1 / 1 / 2 / 2; }
-.player2 { grid-area: 1 / 2 / 2 / 3; }
-.div3 { grid-area: 1 / 3 / 2 / 4; }
-.player1 { grid-area: 2 / 1 / 3 / 2; }
-.GameTable { grid-area: 2 / 2 / 3 / 3; }
-.player3 { grid-area: 2 / 3 / 3 / 4; }
-.PlayerList { grid-area: 3 / 1 / 4 / 2; }
-.playerYou { grid-area: 3 / 2 / 4 / 3; }
-.div9 { grid-area: 3 / 3 / 4 / 4; }
+.div1 {
+    grid-area: 1 / 1 / 2 / 2;
+    background-color: red;
+ }
+.player2 { 
+    grid-area: 1 / 2 / 2 / 3;
+    background-color: green;
+ }
+.div3 { 
+    grid-area: 1 / 3 / 2 / 4;
+    background-color: blue;
+ }
+.player1 { 
+    grid-area: 2 / 1 / 3 / 2;
+    background-color: yellow;
+ }
+.GameTable { 
+    grid-area: 2 / 2 / 3 / 3;
+    background-color: orange;
+ }
+.player3 { 
+    grid-area: 2 / 3 / 3 / 4;
+    background-color: pink;
+ }
+.PlayerList { 
+    grid-area: 3 / 1 / 4 / 2;
+    background-color: purple;
+ }
+.playerYou { 
+    grid-area: 3 / 2 / 4 / 3;
+    background-color: cyan;
+ }
+.div9 { 
+    grid-area: 3 / 3 / 4 / 4;
+    background-color: brown;
+ }
 

@@ -44,11 +44,34 @@ function render(match) {
         li.textContent = "Player " + key + " has " + match.opponentCardsAmount[key] + " cards left";
         playerListElement.appendChild(li);
     } 
+
     //render YOUR CARDS
-    
+    const yourArea = document.getElementById("cardArea1");
+
+    const ctx = yourArea.getContext("2d");
+    ctx.clearRect(0, 0, yourArea.width, yourArea.height);
+
+    const cardsPerRow = 6;
+
+    for (let i = 0; i < match.cards.length; i++ ) {
+
+        const card = match.cards[i];
+        let pic = new Image();
+        
+        pic.onload = () => {
+            let row = Math.floor(i / cardsPerRow);
+            row *= 50;
+
+            let place = i % cardsPerRow;
+
+            ctx.drawImage(pic, 35 * place, 0 + row, 50, 50);
+        };
+        pic.src = `/cards/${card}.png`
+    } 
+
+    //render OPPONENTS cards
 
 }
-
 let isFetching = false;
 
 setInterval(async () => {

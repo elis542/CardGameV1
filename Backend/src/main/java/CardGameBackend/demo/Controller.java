@@ -35,15 +35,23 @@ public class Controller {
 		if (joinMatch == null) {
 			System.out.println("Spelare försökte ansluta till match som ej finns!");
 			return ResponseEntity.status(404).build();
+			
+		} else if (joinMatch.getAllPlayer().size() > 3) {
+			System.out.println("Spelare försökte ansluta till match som är full");
+			return ResponseEntity.status(402).build(); //match full
+		} else if (joinMatch.getStart()) {
+			System.out.println("Spelare försökte ansluta till match som har startat");
+			return ResponseEntity.status(405).build();
 		}
+		
 		System.out.println("Spelare ansluten till match! MatchID: " + joinMatch.getGameID()); //Ta bort sen!
 		MatchPlayers temp = joinMatch.newPlayer();
+		
 		if (temp == null) {
 			return ResponseEntity.status(403).build();
 		}
-		if (joinMatch.getAllPlayer().size() > 3) {
-			return ResponseEntity.status(402).build(); //match full
-		}
+		
+		
 		return ResponseEntity.ok(temp);
 	}
 	
