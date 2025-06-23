@@ -8,6 +8,8 @@ class gameInfo {
         this.cards = matchData.cards;
         this.gameID = matchData.gameID;
     }
+
+
 }
 
 class PlayerINFO {
@@ -60,37 +62,64 @@ function render(match) {
         
         pic.onload = () => {
             let row = Math.floor(i / cardsPerRow);
-            row *= 50;
+            row *= 40;
 
             let place = i % cardsPerRow;
-
-            ctx.drawImage(pic, 35 * place, 0 + row, 50, 50);
+            const size = 40;
+            ctx.drawImage(pic, 30 * place, 0 + row, size, size);
         };
         pic.src = `/cards/${card}.png`
     } 
 
     //render OPPONENTS cards
+    match.opponentCardsAmount[match.playerID] = match.cards;
 
+    let playersRenderd = 2;
+    let cardBack = new Image();
+
+    cardBack.onload = () => {
+        for (let i = (match.playerID + 1); i < 11; i++) {
+            if (i == match.playerID) {
+                break;
+
+            } else if (match.opponentCardsAmount.hasOwnProperty(i)) {
+                let cardAreaEnemy = document.getElementById(`cardArea${playersRenderd}`);
+                let canvas = cardAreaEnemy.getContext("2d");
+                canvas.clearRect(0, 0, cardAreaEnemy.width, cardAreaEnemy.height);
+
+                playersRenderd += 1;
+                const size = 50;
+                for (let j = 0; j < match.opponentCardsAmount[i]; j++) {
+                    canvas.drawImage(cardBack, (j * 10), 0, size, size);
+                }
+            } else if (i == 9) {
+                i = 0;
+            }
+        }
+    }
+
+    cardBack.src = `/cards/card_back.png`
 }
+
 let isFetching = false;
 
 setInterval(async () => {
     if (isFetching) return;
     try {
-    isFetching = true;
-    const response = await fetch(hostADRESS + "api/gameUpdate?playerID=" + player.playerID + "&gameID=" + player.gameID);
+        isFetching = true;
+        const response = await fetch(hostADRESS + "api/gameUpdate?playerID=" + player.playerID + "&gameID=" + player.gameID);
 
-    if (response.status == 404) {
-        throw new Error ("Något blev fel när gamedata hämtades!");
-    }
-    const matchData = await response.json();
-    let match = new gameInfo(matchData);
+        if (response.status == 404) {
+            throw new Error("Något blev fel när gamedata hämtades!");
+        }
+        const matchData = await response.json();
+        let match = new gameInfo(matchData);
 
-    render(match);
+        render(match);
     } catch (error) {
         window.location.href = "index.html"
     } finally {
         isFetching = false;
     }
-    }
-     , 1500);
+}
+    , 1500);
