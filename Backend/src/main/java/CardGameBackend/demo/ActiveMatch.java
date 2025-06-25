@@ -109,6 +109,11 @@ public class ActiveMatch {
 		for (MatchPlayers x : playersInGame) {
 			if (x.getPlayerID() == playerID) {
 				playersInGame.remove(x);
+				
+				for (MatchPlayers y : playersInGame) {
+					y.removeOpponent(x.getPlayerID());
+				}
+				
 				return true;
 			}
 		}

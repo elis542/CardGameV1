@@ -24,6 +24,27 @@ class PlayerINFO {
     }
 }
 
+async function leaveGame() {
+
+    try {
+        const response = await fetch(hostADRESS + "api/leave?playerID=" + player.playerID + "&gameID=" + player.gameID, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error("Leave misslyckades")
+        }
+
+        window.location.href = "index.html"
+
+    } catch (error) {
+        console.log("error!")
+        window.location.href = "index.html"
+    }
+}
+
+let selectedCard = null;
+
 if (sessionStorage.getItem("player") == null) {
     window.location.href = "index.html"
 }
@@ -49,33 +70,37 @@ function render(match) {
 
     //render YOUR CARDS
     const yourArea = document.getElementById("cardArea1");
-
-    const ctx = yourArea.getContext("2d");
-    ctx.clearRect(0, 0, yourArea.width, yourArea.height);
-
-    const cardsPerRow = 6;
-
-    for (let i = 0; i < match.cards.length; i++ ) {
-
-        const card = match.cards[i];
-        let pic = new Image();
+    yourArea.innerHTML = "";
+    
+    for (let x of match.cards) {
+        let img = document.createElement("img");
         
-        pic.onload = () => {
-            let row = Math.floor(i / cardsPerRow);
-            row *= 40;
+        img.addEventListener("click", () => {
+            selectedCard = x;
+            let chosenCard = document.getElementById("valtKort");
 
-            let place = i % cardsPerRow;
-            const size = 40;
-            ctx.drawImage(pic, 30 * place, 0 + row, size, size);
-        };
-        pic.src = `/cards/${card}.png`
-    } 
+            chosenCard.src = `/cards/${x}.png`;
+        })
+
+        img.classList.add("playerCard");
+        img.src = `/cards/${x}.png`;
+        yourArea.appendChild(img);
+    }
+    
 
     //render OPPONENTS cards
     match.opponentCardsAmount[match.playerID] = match.cards;
 
     let playersRenderd = 2;
     let cardBack = new Image();
+
+    console.log(match.opponentCardsAmount);
+
+    for (let x = 2; x < 5; x++) { //Clear all opponent areas
+        let opponentArea = document.getElementById(`cardArea${x}`);
+        let canvas = opponentArea.getContext("2d");
+        canvas.clearRect(0, 0, opponentArea.width, opponentArea.height);
+    }
 
     cardBack.onload = () => {
         for (let i = (match.playerID + 1); i < 11; i++) {

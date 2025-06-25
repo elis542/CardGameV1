@@ -26,6 +26,10 @@ public class MatchPlayers {
 		opponentCardsAmount.remove(playerID);
 	}
 	
+	public void removeOpponent(int x) {
+		opponentCardsAmount.remove((Integer)x);
+	}
+	
 	public HashMap<Integer, Integer> getOpponentCardsAmount() {
 		return opponentCardsAmount;
 	}
