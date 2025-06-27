@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -95,6 +96,21 @@ public class Controller {
 			return ResponseEntity.status(202).build(); //Answer if the match has started!
 		}
 		return ResponseEntity.ok(holder.getAllPlayer());
+	}
+	
+	private record moveStruct(String card, int fromPlayer, int playerID, int gameID) {}
+		
+	@PostMapping()
+	public ResponseEntity<Integer> doMove(@RequestBody moveStruct moveMade) {
+		ActiveMatch holder = ActiveGameLogicUpdater.getMatchByID(moveMade.gameID);
+		int status = holder.makeMove(moveMade.card, moveMade.fromPlayer, moveMade.playerID);
+		
+		if (status == 2) {
+			return ResponseEntity.ok().body(2); //full sucess!
+		} else if (status == 1) {
+			return ResponseEntity.ok().body(1); //Player does not have card!
+		}
+		return ResponseEntity.status(400).body(0); //Not your turn or you do not have the card
 	}
 	
 	@PostMapping("/leave")

@@ -2,14 +2,12 @@ const hostADRESS = "http://localhost:8080/";
 
 class gameInfo {
     constructor(matchData) {
-        this.myTurn = matchData.turn;
+        this.turn = matchData.turn;
         this.opponentCardsAmount = matchData.opponentCardsAmount;
         this.playerID = matchData.playerID;
         this.cards = matchData.cards;
         this.gameID = matchData.gameID;
     }
-
-
 }
 
 class PlayerINFO {
@@ -45,36 +43,53 @@ async function leaveGame() {
 
 let selectedCard = null;
 
+let chosenCardTemplate = document.getElementById("valtKort");
+chosenCardTemplate.src = "/cards/card_back.png";
+
 if (sessionStorage.getItem("player") == null) {
     window.location.href = "index.html"
 }
 
-const playerStringed =  sessionStorage.getItem("player");
+const playerStringed = sessionStorage.getItem("player");
 const playerObj = JSON.parse(playerStringed);
 const player = new PlayerINFO(playerObj.playerID, playerObj.gameID);
 
 document.addEventListener("DOMContentLoaded", () => {
     const displayId = document.getElementById("displayName");
-    displayId.innerHTML = `PlayperID: ${player.playerID} GameID: ${player.gameID}`; 
+    displayId.innerHTML = `PlayperID: ${player.playerID} GameID: ${player.gameID}`;
 })
 
 function render(match) {
     //render PLAYERLIST
-     const playerListElement = document.getElementById("playerlist");
-     playerListElement.innerHTML= "";
-      for (const key in match.opponentCardsAmount) {
+    const playerListElement = document.getElementById("playerlist");
+    playerListElement.innerHTML = "";
+    for (const key in match.opponentCardsAmount) {
         const li = document.createElement("li");
         li.textContent = "Player " + key + " has " + match.opponentCardsAmount[key] + " cards left";
         playerListElement.appendChild(li);
-    } 
+    }
+
+    //Render PLAYERS turn dot
+    let turnDot = document.getElementById("listCanvas");
+    let listCanvas = turnDot.getContext("2d");
+
+    listCanvas.beginPath();
+    listCanvas.arc(turnDot.width / 2, turnDot.height / 2, 60, 0, 2 * Math.PI);
+
+    if (match.playerID == match.turn) {
+        listCanvas.fillStyle = "green";
+    } else {
+        listCanvas.fillStyle = "red";
+    }
+    listCanvas.fill();
 
     //render YOUR CARDS
     const yourArea = document.getElementById("cardArea1");
     yourArea.innerHTML = "";
-    
+
     for (let x of match.cards) {
         let img = document.createElement("img");
-        
+
         img.addEventListener("click", () => {
             selectedCard = x;
             let chosenCard = document.getElementById("valtKort");
@@ -86,15 +101,13 @@ function render(match) {
         img.src = `/cards/${x}.png`;
         yourArea.appendChild(img);
     }
-    
+
 
     //render OPPONENTS cards
     match.opponentCardsAmount[match.playerID] = match.cards;
 
     let playersRenderd = 2;
     let cardBack = new Image();
-
-    console.log(match.opponentCardsAmount);
 
     for (let x = 2; x < 5; x++) { //Clear all opponent areas
         let opponentArea = document.getElementById(`cardArea${x}`);
@@ -114,6 +127,19 @@ function render(match) {
 
                 playersRenderd += 1;
                 const size = 50;
+
+                //Paint cirkel depending on whos turn it is!
+                canvas.beginPath();
+                canvas.arc(cardAreaEnemy.width - 20, cardAreaEnemy.height - 20, 18, 0, 2 * Math.PI);
+
+                if (i == match.turn) {
+                    canvas.fillStyle = "blue";
+                } else {
+                    canvas.fillStyle = "red";
+                }
+                canvas.fill();
+
+                //Paint cards
                 for (let j = 0; j < match.opponentCardsAmount[i]; j++) {
                     canvas.drawImage(cardBack, (j * 10), 0, size, size);
                 }
@@ -139,7 +165,6 @@ setInterval(async () => {
         }
         const matchData = await response.json();
         let match = new gameInfo(matchData);
-
         render(match);
     } catch (error) {
         window.location.href = "index.html"

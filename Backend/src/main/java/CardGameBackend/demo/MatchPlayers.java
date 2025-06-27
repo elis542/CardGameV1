@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MatchPlayers {
-	private boolean isMyTurn = false;
+	private int playerTurn = 3;
 	private HashMap<Integer, Integer> opponentCardsAmount = new HashMap<Integer, Integer>(); //player ID, Card amount
 	private int playerID;
 	private ArrayList<String> cards = new ArrayList<>();
@@ -38,6 +38,10 @@ public class MatchPlayers {
 		cards.add(card);
 	}
 	
+	public void removeCard(String card) {
+		cards.remove(card);
+	}
+	
 	public int getGameID() {
 		return gameID;
 	}
@@ -46,15 +50,11 @@ public class MatchPlayers {
 		return cards;
 	}
 	
-	public void turnSpent() {
-		isMyTurn = false;
+	public int getTurn() {
+		return playerTurn;
 	}
 	
-	public void turn() {
-		isMyTurn = true;
-	}
-	
-	public boolean getTurn() {
-		return isMyTurn;
+	public void setTurn(int i) {
+		playerTurn = i;
 	}
 }

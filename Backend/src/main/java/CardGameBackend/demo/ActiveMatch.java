@@ -2,6 +2,7 @@ package CardGameBackend.demo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -13,6 +14,7 @@ public class ActiveMatch {
 	private ArrayList<MatchPlayers> playersInGame = new ArrayList<>();
 	private int TimeSinceActivity;
 	private ArrayList<String> deckOfCards = new ArrayList<>();
+	private int playerTurn = 0; //ID of the player whos turn it is
 	
 	public ActiveMatch(String gameType) {
 		this.gameType = gameType;
@@ -51,14 +53,53 @@ public class ActiveMatch {
 			System.out.println("tar bort match!");
 			setInactive();
 		}
+		
 		if (!isStarted) {
 			return;
 		}
 	}
 	
-	public void start() {
-		createDeckOfCards();
+	public int makeMove(String card, int fromPlayer, int playerID) {
+		MatchPlayers playerHolder = playersInGame.get(playerID);
+		MatchPlayers enemy = playersInGame.get(fromPlayer);
 		
+		if (playerTurn != playerID || !playerHolder.getCards().contains(card)) {
+			return 0; //Means its not their turn or they dont have the card.
+			
+		} else if (!enemy.getCards().contains(card)) {
+			playerHolder.addCard(deckOfCards.getFirst());
+			deckOfCards.removeFirst();
+			
+			return 1; //Enemy player does not have card!
+			
+		} else if (playerTurn == playerID && enemy.getCards().contains(card) && playerHolder.getCards().contains(card)) {
+			
+			playerHolder.addCard(card);
+			enemy.removeCard(card);
+			
+			for (int i = playerHolder.getPlayerID() + 1; i < 11; i++) {
+				for (MatchPlayers x : playersInGame) {
+					if (i == x.getPlayerID()) {
+						playerTurn = i;
+						break;
+					}
+				}
+				if (i == 10) {
+					i = 0;
+				}
+			}
+			
+			return 2; //Full sucess
+		}
+		
+	return 0;
+	}
+	
+	public void start() {
+		playersInGame.sort(Comparator.comparing(MatchPlayers::getPlayerID));
+		
+		createDeckOfCards();
+		playerTurn = playersInGame.getFirst().getPlayerID();
 		isStarted = true;
 		
 		for (MatchPlayers x : playersInGame) {
