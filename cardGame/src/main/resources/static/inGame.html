@@ -1,0 +1,44 @@
+<DOCTYPE html>
+  <html lang="sv">
+
+  <head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Game</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div style="display: flex">
+      <p id="displayName"></p>
+      <h3 id="gameMessage" style="margin-left: 3%"></h3>
+    </div>
+    <div class="parent">
+      <div class="div1"> </div>
+      <div class="player2" id="p3">
+        <canvas id="cardArea3"> </canvas>
+      </div>
+      <div class="div3"> </div>
+      <div class="player1" id="p2">
+        <canvas id="cardArea2"> </canvas>
+      </div>
+      <div class="GameTable"> </div>
+      <div class="player3" id="p4">
+        <canvas id="cardArea4"> </canvas>
+      </div>
+      <div class="PlayerList">
+        <ul id="playerlist"></ul>
+        <p id="errorMessage">Error Message: </p>
+        <canvas id="listCanvas"> </canvas>
+      </div>
+      <div class="playerYou" id="cardArea1">
+
+      </div>
+      <div class="div9">
+        <button id="buttonStealInGame" style="margin: 3%;" onclick="makeMove()">Stjäl kort!</button>
+        <button id="buttonLeaveInGame" onclick="leaveGame()">Lämna spel!</button>
+        <img id="valtKort"> </img>
+        <p id="selectedPlayer">Selected player: </p>
+      </div>
+    </div>
+    <script src="gameScript.js"></script>
+  </body>

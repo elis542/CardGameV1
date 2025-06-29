@@ -1,4 +1,4 @@
-const HostADRESS = "http://localhost:8080/";
+const HostADRESS = "http://192.168.50.81:8080/";
 
 class PlayerINFO {
     constructor(playerID, gameID) {

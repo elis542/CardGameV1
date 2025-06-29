@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Random;
+import java.util.LinkedList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ActiveMatch {
 	private boolean active = true;
@@ -13,8 +16,10 @@ public class ActiveMatch {
 	private String gameType;
 	private ArrayList<MatchPlayers> playersInGame = new ArrayList<>();
 	private int TimeSinceActivity;
-	private ArrayList<String> deckOfCards = new ArrayList<>();
-	private int playerTurn = 0; //ID of the player whos turn it is
+	private LinkedList<String> deckOfCards = new LinkedList<>();
+	private int playerTurn = 1; //ID of the player whos turn it is
+	private boolean isOver = false;
+	private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
 	
 	public ActiveMatch(String gameType) {
 		this.gameType = gameType;
@@ -47,59 +52,146 @@ public class ActiveMatch {
 		active = false;
 	}
 	
+	public boolean getIsOver() {
+		return isOver;
+	}
+	
+	public MatchPlayers getMostPoints() {
+		MatchPlayers winner;
+		winner = playersInGame.get(0);
+		
+		for (MatchPlayers player : playersInGame) {
+			if (player.getPoints() > winner.getPoints()) {
+				winner = player;
+			}
+		}
+		
+		return winner;
+	}
+	
+	private void closeAfterWinning() {
+		timer.schedule(() -> {
+			active = false;
+			timer.shutdown();
+		}, 5, TimeUnit.SECONDS);
+	}
+
 	public void update() {
 		TimeSinceActivity++;
+		if (deckOfCards.size() < 1 && isStarted == true) {
+			isOver = true;
+			closeAfterWinning();
+		}
+
 		if (TimeSinceActivity > 5 || playersInGame.size() < 1) {
 			System.out.println("tar bort match!");
 			setInactive();
 		}
-		
+
 		if (!isStarted) {
 			return;
+		}
+		
+		HashMap<Integer, Integer> allPlayerPairs = new HashMap<>();
+		for (MatchPlayers player : playersInGame) {
+			player.testPair();
+			
+			allPlayerPairs.put(player.getPlayerID(), player.getPoints());
+		}
+		updateTurn();
+		for (MatchPlayers player : playersInGame) {
+			player.setOpponentPoints(allPlayerPairs);
+		}
+	}
+
+	public void nextTurn(MatchPlayers playerHolder) {
+		for (int i = playerHolder.getPlayerID() + 1; i < 11; i++) {
+			for (MatchPlayers x : playersInGame) {
+				if (i == x.getPlayerID()) {
+					playerTurn = i;
+					updateTurn();
+					return;
+				}
+			}
+			if (i == 10) {
+				i = 0;
+			}
 		}
 	}
 	
 	public int makeMove(String card, int fromPlayer, int playerID) {
-		MatchPlayers playerHolder = playersInGame.get(playerID);
-		MatchPlayers enemy = playersInGame.get(fromPlayer);
+		MatchPlayers playerHolder = null;
+		for (MatchPlayers x : playersInGame) {
+			if (x.getPlayerID() == playerID) {
+				playerHolder = x;
+			}
+		}
+		
+		if (playerHolder == null) {
+			active = false;
+			return 0;
+		}
+		
+		MatchPlayers enemy = null;
+		for (MatchPlayers x : playersInGame) {
+			if (x.getPlayerID() == fromPlayer) {
+				 enemy = x;
+			}
+		}
+		
+		if (enemy == null) {
+			active = false;
+			return 0;
+		}
 		
 		if (playerTurn != playerID || !playerHolder.getCards().contains(card)) {
 			return 0; //Means its not their turn or they dont have the card.
 			
-		} else if (!enemy.getCards().contains(card)) {
-			playerHolder.addCard(deckOfCards.getFirst());
-			deckOfCards.removeFirst();
-			
-			return 1; //Enemy player does not have card!
-			
-		} else if (playerTurn == playerID && enemy.getCards().contains(card) && playerHolder.getCards().contains(card)) {
-			
-			playerHolder.addCard(card);
-			enemy.removeCard(card);
-			
-			for (int i = playerHolder.getPlayerID() + 1; i < 11; i++) {
-				for (MatchPlayers x : playersInGame) {
-					if (i == x.getPlayerID()) {
-						playerTurn = i;
-						break;
-					}
-				}
-				if (i == 10) {
-					i = 0;
+		} 
+		
+		boolean searchSucess = false;
+		for (int x = 0; x < 4; x++) {
+			String cardSearch = enemy.getCardType(card.charAt(1));
+			if (cardSearch == null) {
+				if (searchSucess) {
+					return 2;
+				} else {
+					nextTurn(playerHolder);
+					playerHolder.addCard(deckOfCards.getFirst());
+					deckOfCards.removeFirst();
+					System.out.println(deckOfCards.size());
+					return 1;
 				}
 			}
-			
-			return 2; //Full sucess
+			enemy.removeCard(cardSearch);
+			playerHolder.addCard(cardSearch);
+			searchSucess = true;
 		}
 		
+	nextTurn(playerHolder);
 	return 0;
+	}
+	
+	private void updateTurn() {
+		HashMap<Integer, Integer> cardMap = new HashMap<>();
+		for (MatchPlayers x : playersInGame) {
+			cardMap.put(x.getPlayerID(), x.getCards().size());
+		}
+		
+		for (MatchPlayers x : playersInGame) {
+			x.setOpponents(cardMap);
+		}
+		
+		for (MatchPlayers x : playersInGame) {
+			x.setTurn(playerTurn);
+		}
 	}
 	
 	public void start() {
 		playersInGame.sort(Comparator.comparing(MatchPlayers::getPlayerID));
 		
 		createDeckOfCards();
-		playerTurn = playersInGame.getFirst().getPlayerID();
+		updateTurn();
 		isStarted = true;
 		
 		for (MatchPlayers x : playersInGame) {

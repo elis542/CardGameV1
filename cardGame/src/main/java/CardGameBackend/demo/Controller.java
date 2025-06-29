@@ -17,11 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class Controller {
 	
-	@GetMapping()
-	public ResponseEntity<Boolean> basicAnswer() {
-		return ResponseEntity.ok(true);
-	}
-	
 	@PostMapping("/create")
 	public ResponseEntity<MatchPlayers> createGame(@RequestParam String gameType) {	
 		
@@ -82,6 +77,10 @@ public class Controller {
 		if (findPlayer == null) {
 			return ResponseEntity.status(404).build();
 		}
+		
+		if (findMatch.getIsOver()) {
+			return ResponseEntity.status(210).body(findMatch.getMostPoints());
+		}
 		return ResponseEntity.ok().body(findPlayer);
 	}
 	
@@ -100,7 +99,7 @@ public class Controller {
 	
 	private record moveStruct(String card, int fromPlayer, int playerID, int gameID) {}
 		
-	@PostMapping()
+	@PostMapping("/doMove")
 	public ResponseEntity<Integer> doMove(@RequestBody moveStruct moveMade) {
 		ActiveMatch holder = ActiveGameLogicUpdater.getMatchByID(moveMade.gameID);
 		int status = holder.makeMove(moveMade.card, moveMade.fromPlayer, moveMade.playerID);

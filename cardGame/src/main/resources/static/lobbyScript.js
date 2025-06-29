@@ -1,4 +1,4 @@
-const hostADRESS = "http://localhost:8080/";
+const hostADRESS = "http://192.168.50.81:8080/";
 
 class PlayerINFO {
     constructor(playerID, gameID) {
@@ -20,7 +20,6 @@ const playerObj = JSON.parse(playerStringed);
 const player = new PlayerINFO(playerObj.playerID, playerObj.gameID);
 
 const playerList = async () => { //Den här kollar också om matchen har startat, så det är med av en update :)
-        console.log(player.gameID);
         try {
             const response = await fetch(hostADRESS + "api/players?gameID=" + player.gameID);
 
